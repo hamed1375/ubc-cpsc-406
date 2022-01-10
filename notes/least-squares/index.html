@@ -113,7 +113,7 @@ x &#61; A&#39;A \ A&#39;b
 <p>The least-squares solution should also verify the first condition of the above theorem:</p>
 <pre><code class=language-julia >r &#61; b - A*x
 @show&#40;norm&#40;A&#39;r&#41;&#41;</code></pre>
-<pre><code class="plaintext code-output">norm(A' * r) = 8.36838286293807e-11
+<pre><code class="plaintext code-output">norm(A' * r) = 8.36838961998155e-11
 </code></pre>
 <h2 id=the_backslash_operator ><a href="#the_backslash_operator" class=header-anchor >The backslash operator </a></h2>
 <p>In this last example, we solved for the least-squares solution by explicitly solving the normal equations \(A^T\! Ax=A^T\! b\) via the Julia command <code>x &#61; A&#39;A \ A&#39;b</code>. As we&#39;ll see in a later lecture, this isn&#39;t the best way to solve the least-squares problem. Without getting into the details just yet, it&#39;s enough for now to know that Julia allows for the short-hand <code>x &#61; A \ b</code>: Julia recognizes that this is an overdetermined system, and solves for the least-squares solution using a mathematically equivalent approach. Let&#39;s verify:</p>

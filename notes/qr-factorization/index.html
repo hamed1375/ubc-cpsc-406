@@ -11,17 +11,17 @@ A &#61; randn&#40;m,n&#41;
 Q, R &#61; qr&#40;A&#41;</code></pre> <p><pre><code class="plaintext code-output">LinearAlgebra.QRCompactWY{Float64, Matrix{Float64}}
 Q factor:
 4×4 LinearAlgebra.QRCompactWYQ{Float64, Matrix{Float64}}:
- -0.674102   0.149752   -0.693114    0.206772
- -0.527529   0.0126286   0.671128    0.520712
- -0.280534  -0.924772   -0.0036544  -0.257068
-  0.434282  -0.349587   -0.262997    0.787414
+ -0.865741  -0.163418   0.262857   0.393311
+  0.049414  -0.931378  -0.358619  -0.0385409
+  0.286236   0.104966  -0.329213   0.893683
+  0.407578  -0.307915   0.833017   0.212488
 R factor:
 3×3 Matrix{Float64}:
- -2.2302  -2.17895  -1.9316
-  0.0      2.00811  -0.019888
-  0.0      0.0       1.3985</code></pre> and we can verify the orthogonality of <code>Q</code>:</p> <pre><code class=language-julia >@show norm&#40;Q&#39;*Q - I&#41;
-@show norm&#40;Q*Q&#39; - I&#41;</code></pre> <pre><code class="plaintext code-output">norm(Q' * Q - I) = 4.2548491720905944e-16
-norm(Q * Q' - I) = 4.6454327060952e-16
+ -2.05061  1.21006  -1.12051
+  0.0      1.39437   1.35129
+  0.0      0.0       2.21564</code></pre> and we can verify the orthogonality of <code>Q</code>:</p> <pre><code class=language-julia >@show norm&#40;Q&#39;*Q - I&#41;
+@show norm&#40;Q*Q&#39; - I&#41;</code></pre> <pre><code class="plaintext code-output">norm(Q' * Q - I) = 2.0206364052201326e-16
+norm(Q * Q' - I) = 1.5921699938447839e-16
 </code></pre> <p>Julia <a href="https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/#LinearAlgebra.QRCompactWY">stores</a> the factor <code>Q</code> as a series of <a href="https://en.wikipedia.org/wiki/Householder_transformation#QR_decomposition">Householder reflectors</a>.</p> <h3 id=thin_qr ><a href="#thin_qr" class=header-anchor >Thin QR</a></h3> <p>To extract the &quot;thin&quot; QR factorization from <code>qr</code>, use the <code>Matrix</code> conversion function:</p> <pre><code class=language-julia >F &#61; qr&#40;A&#41;
 Q₁ &#61; Matrix&#40;F.Q&#41;
 R₁ &#61; F.R
@@ -29,14 +29,14 @@ R₁ &#61; F.R
 @show size&#40;R₁&#41;
 @show norm&#40;A - Q₁*R₁&#41;</code></pre> <pre><code class="plaintext code-output">size(Q₁) = (4, 3)
 size(R₁) = (3, 3)
-norm(A - Q₁ * R₁) = 6.106226635438361e-16
+norm(A - Q₁ * R₁) = 3.4021815010030383e-16
 </code></pre> <h2 id=solving_least_squares_via_qr ><a href="#solving_least_squares_via_qr" class=header-anchor >Solving least squares via QR</a></h2> <p>The QR factorization can be used to solve the least squares problem</p> <div class=nonumber >\[ \min_{x\in\mathbb R^n}\ \| A x -b\|^2. \]</div> <p>Assume throughout this section that \(A\) has full columns rank, and hence \(m\geq n\). &#40;The QR factorization also can be used to solve the more general problem, but we don&#39;t consider that case here.&#41; Let \(A = QR\) be the QR factorization shown in <span class=eqref >(<a href="#eqqr-fact">1</a>)</span>. Because the 2-norm is invariant under orthogonal rotation,</p> <a id=eqls-derivation  class=anchor ></a>\[\begin{aligned} \|Ax -b\|^2 & = \| Q ^T\! ( Ax -b)\|^2\\ &=\left\|\begin{bmatrix} R_1\\0\end{bmatrix} x -\begin{bmatrix} Q_1^T\\Q_2^T\end{bmatrix}b\right\|^2\\ & = \|R_1x - Q_1^T b\|^2+\|Q_2^T b\|^2. \end{aligned}\] <p>Hence, minimizing \(\|R_1 x - Q_1^T b\|\) also minimizes \(\|Ax-b\|\). Because \( A \) is full rank, \(R_1\) is nonsingular, and the least-squares solution is obtained as the unique solution of the system </p> <div class=nonumber >\[ R_1 x = Q_1^T b. \]</div> <p>The procedure for solving least-squares problems via the QR factorization can then be summarized as follows:</p> <div class=theorem ><p><strong>Algorithm</strong>: &#40;<em>Least-squares via QR</em>&#41; <br/> </p> <ul> <li><p>compute the thin QR factorization \(A = Q_1 R_1\)</p> <li><p>backsolve the triangular linear system \(R_1 x = Q_1^T b\)</p> </ul></div> <p>Here&#39;s a simple random example in Julia:</p> <pre><code class=language-julia >m, n &#61; 4, 3
 A &#61; randn&#40;m, n&#41;
 b &#61; randn&#40;m&#41;
 F &#61; qr&#40;A&#41;
 Q₁, R₁ &#61; Matrix&#40;F.Q&#41;, F.R
 x &#61; R₁ \ Q₁&#39;b # do NOT use x &#61; inv&#40;R₁&#41;*Q₁&#39;b</code></pre> <p>and we can verify that <code>x</code> is the least-squares solution by verifying that the residual \(r=b-Ax\) is orthogonal to the columns of \(A\): </p> <pre><code class=language-julia >r &#61; b - A*x
-@show norm&#40;A&#39;r&#41;</code></pre> <pre><code class="plaintext code-output">norm(A' * r) = 4.0839384567343154e-16
+@show norm&#40;A&#39;r&#41;</code></pre> <pre><code class="plaintext code-output">norm(A' * r) = 2.3900872038044816e-15
 </code></pre> <p>The last line of the derivation shown in <span class=eqref >(<a href="#eqls-derivation">2</a>)</span> asserts that the norm of the residual is equal to the norm of \(Q_2^b\). Let&#39;s check:</p> <pre><code class=language-julia >Q₂ &#61; F.Q&#91;:,n&#43;1:end&#93;
 norm&#40;Q₂&#39;b&#41; ≈ norm&#40;r&#41;</code></pre> <pre><code class="plaintext code-output">true</code></pre>
 
