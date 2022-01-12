@@ -91,16 +91,7 @@ mtcars &#61; RDatasets.dataset&#40;&quot;datasets&quot;, &quot;mtcars&quot;&#41;
 <p>Because this is such an important problem in general, there exists excellent software packages that make formulating and solving these problems easy. Here&#39;s how to do it using the generalized linear models package <a href="https://juliastats.org/GLM.jl/stable/">GLM.jl</a>: </p>
 <pre><code class="language-julia">using GLM
 ols &#61; lm&#40;@formula&#40;MPG ~ Disp &#43; HP &#43; WT&#41;, mtcars&#41;</code></pre>
-<pre><code class="plaintext code-output">::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=179::parsing MPG ~ Disp + HP + WT
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=195::  (~) i=2: MPG
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=195::  (~) i=3: Disp + HP + WT
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=179::parsing Disp + HP + WT
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=195::  (+) i=2: Disp
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=195::  (+) i=3: HP
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=195::  (+) i=4: WT
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=203::done: Disp + HP + WT
-::debug file=../../../.julia/packages/StatsModels/m1jYD/src/formula.jl,line=203::done: MPG ~ Disp + HP + WT
-StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}}}}, Matrix{Float64}}
+<pre><code class="plaintext code-output">StatsModels.TableRegressionModel{GLM.LinearModel{GLM.LmResp{Vector{Float64}}, GLM.DensePredChol{Float64, LinearAlgebra.CholeskyPivoted{Float64, Matrix{Float64}}}}, Matrix{Float64}}
 
 MPG ~ 1 + Disp + HP + WT
 
