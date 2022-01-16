@@ -166,19 +166,19 @@ Q, R &#61; qr&#40;A&#41;</code></pre>
 <p><pre><code class="plaintext code-output">LinearAlgebra.QRCompactWY{Float64, Matrix{Float64}}
 Q factor:
 4×4 LinearAlgebra.QRCompactWYQ{Float64, Matrix{Float64}}:
- -0.349022   -0.172823  -0.91246    -0.125433
-  0.30469    -0.940762   0.0420205   0.142707
- -0.0588549   0.123716  -0.135805    0.981217
- -0.884242   -0.264185   0.383678    0.0333741
+ -0.666953  -0.513822   0.539118   0.0226297
+ -0.29988   -0.161909  -0.491664  -0.801326
+ -0.673595   0.469383  -0.402935   0.404466
+  0.107309  -0.699608  -0.552505   0.440195
 R factor:
 3×3 Matrix{Float64}:
- 1.78245  -0.909516   0.513468
- 0.0      -2.06935   -0.198369
- 0.0       0.0        0.603424</code></pre> and we can verify the orthogonality of <code>Q</code>:</p>
+ -1.99319  0.440171   1.53143
+  0.0      2.18216   -0.111783
+  0.0      0.0        1.20778</code></pre> and we can verify the orthogonality of <code>Q</code>:</p>
 <pre><code class="language-julia">@show norm&#40;Q&#39;*Q - I&#41;
 @show norm&#40;Q*Q&#39; - I&#41;</code></pre>
-<pre><code class="plaintext code-output">norm(Q' * Q - I) = 9.268489707777499e-16
-norm(Q * Q' - I) = 8.840080028254415e-16
+<pre><code class="plaintext code-output">norm(Q' * Q - I) = 5.40788740688267e-16
+norm(Q * Q' - I) = 5.004970348792699e-16
 </code></pre>
 <p>Julia <a href="https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/#LinearAlgebra.QRCompactWY">stores</a> the factor <code>Q</code> as a series of <a href="https://en.wikipedia.org/wiki/Householder_transformation#QR_decomposition">Householder reflectors</a>.</p>
 <h3 id="thin_qr"><a href="#thin_qr" class="header-anchor">Thin QR</a></h3>
@@ -191,13 +191,13 @@ R₁ &#61; F.R
 @show norm&#40;A - Q₁*R₁&#41;</code></pre>
 <pre><code class="plaintext code-output">size(Q₁) = (4, 3)
 size(R₁) = (3, 3)
-norm(A - Q₁ * R₁) = 1.354133634487781e-15
+norm(A - Q₁ * R₁) = 8.120581339769891e-16
 </code></pre>
 <h2 id="solving_least_squares_via_qr"><a href="#solving_least_squares_via_qr" class="header-anchor">Solving least squares via QR</a></h2>
 <p>The QR factorization can be used to solve the least squares problem</p>
-<div class="nonumber">\[
+<a id="eqleast-squares" class="anchor"></a>\[ 
   \min_{x\in\mathbb R^n}\ \| A  x -b\|^2.
-\]</div>
+\]
 <p>Assume throughout this section that \(A\) has full columns rank, and hence \(m\geq n\). &#40;The QR factorization also can be used to solve the more general problem, but we don&#39;t consider that case here.&#41; Let \(A = QR\) be the QR factorization shown in <span class="eqref">(<a href="#eqqr-fact">1</a>)</span>. Because the 2-norm is invariant under orthogonal rotation,</p>
 <a id="eqls-derivation" class="anchor"></a>\[\begin{aligned} 
 \|Ax -b\|^2
@@ -206,9 +206,9 @@ norm(A - Q₁ * R₁) = 1.354133634487781e-15
 & = \|R_1x  - Q_1^T b\|^2+\|Q_2^T b\|^2.
 \end{aligned}\]
 <p>Hence, minimizing \(\|R_1 x - Q_1^T b\|\) also minimizes \(\|Ax-b\|\). Because \( A \) is full rank, \(R_1\) is nonsingular, and the least-squares solution is obtained as the unique solution of the system </p>
-<div class="nonumber">\[
+<a id="eqls-via-qr" class="anchor"></a>\[ 
   R_1 x  = Q_1^T b.
-\]</div>
+\]
 <p>The procedure for solving least-squares problems via the QR factorization can then be summarized as follows:</p>
 <div class="theorem"><p><strong>Algorithm</strong>: &#40;<em>Least-squares via QR</em>&#41; <br/> </p>
 <ul>
@@ -227,16 +227,69 @@ x &#61; R₁ \ Q₁&#39;b # do NOT use x &#61; inv&#40;R₁&#41;*Q₁&#39;b</cod
 <p>and we can verify that <code>x</code> is the least-squares solution by verifying that the residual \(r=b-Ax\) is orthogonal to the columns of \(A\): </p>
 <pre><code class="language-julia">r &#61; b - A*x
 @show norm&#40;A&#39;r&#41;</code></pre>
-<pre><code class="plaintext code-output">norm(A' * r) = 5.117875266520903e-16
+<pre><code class="plaintext code-output">norm(A' * r) = 8.000216676868747e-16
 </code></pre>
-<p>The last line of the derivation shown in <span class="eqref">(<a href="#eqls-derivation">2</a>)</span> asserts that the norm of the residual is equal to the norm of \(Q_2^T b\). Let&#39;s check:</p>
+<p>The last line of the derivation shown in <span class="eqref">(<a href="#eqls-derivation">3</a>)</span> asserts that the norm of the residual is equal to the norm of \(Q_2^T b\). Let&#39;s check:</p>
 <pre><code class="language-julia">Q₂ &#61; F.Q&#91;:,n&#43;1:end&#93;
 norm&#40;Q₂&#39;b&#41; ≈ norm&#40;r&#41;</code></pre>
 <pre><code class="plaintext code-output">true</code></pre>
+<h2 id="qr_versus_the_normal_equations"><a href="#qr_versus_the_normal_equations" class="header-anchor">QR versus the normal equations</a></h2>
+<p>A solution \(x^*\) of a full-rank least-squares problem <span class="eqref">(<a href="#eqleast-squares">2</a>)</span> can be obtained as the solution of the normal equations:</p>
+<div class="nonumber">\[
+  A^T\! A x = A^T\! b.
+\]</div>
+<p>This approach, however, can in some cases suffer from numerical instability, which means that floating-point computations used by most computers yield solutions with unacceptable errors. The QR approach, on the other hand, often allows us to solve a wider-range of problems. The next example, borrowed from the course on <a href="https://fncbook.github.io/fnc/leastsq/demos/normaleqns-instab.html">Fundamentals of Numerical Computation</a>, illustrates this point.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Pythagorean_trigonometric_identity">Pythagorean identity</a> asserts that</p>
+<div class="nonumber">\[
+\sin^2(θ) + cos^2(θ) = 1
+\]</div>
+<p>for all values of \(\theta\). This implies that the matrix</p>
+<div class="nonumber">\[
+A = \begin{bmatrix} \sin^2(\theta_1) & \cos^2(\theta_1) & 1
+    \\ \vdots          & \vdots           & \vdots
+    \\\sin^2(\theta_m) & \cos^2(\theta_m) & 1\end{bmatrix},
+\]</div>
+<p>for any values \(\theta_1,\ldots,\theta_m\), doesn&#39;t have full column rank. Let&#39;s define a slightly perturbed version of this matrix that does have full column rank:</p>
+<pre><code class="language-julia">θ &#61; LinRange&#40;0,3,400&#41;
+ε &#61; 1e-7
+A &#61; @. &#91;sin&#40;θ&#41;^2   cos&#40;θ&#43;ε&#41;^2   θ^0&#93;</code></pre>
+<p>We can check that this matrix has full column rank:</p>
+<pre><code class="language-julia">rank&#40;A&#41;</code></pre>
+<pre><code class="plaintext code-output">3</code></pre>
+<p>Now create a right-hand side that corresponds to a known solution <code>xᵉ</code>:</p>
+<pre><code class="language-julia">xᵉ &#61; &#91;1., 2., 1.&#93;
+b  &#61; A*xᵉ</code></pre>
+<h3 id="solution_via_the_normal_equations"><a href="#solution_via_the_normal_equations" class="header-anchor">Solution via the normal equations</a></h3>
+<p>Here&#39;s the solution obtained via the normal equations, and its corresponding relative error:</p>
+<pre><code class="language-julia">xⁿ &#61; A&#39;A \ A&#39;b
+eⁿ &#61; norm&#40;xᵉ - xⁿ&#41; / norm&#40;xᵉ&#41;
+@show xⁿ
+@show eⁿ</code></pre>
+<p><pre><code class="plaintext code-output">xⁿ = [1.0763079424467599, 2.0763079426525235, 0.9236920575027481]
+eⁿ = 0.053957863622896736
+</code></pre> This solution has only about 1 digit of accuracy.</p>
+<h3 id="solution_via_qr_factorization"><a href="#solution_via_qr_factorization" class="header-anchor">Solution via QR factorization</a></h3>
+<p>Here&#39;s the solution obtained via the QR factorization, and its corresponding relative error:</p>
+<pre><code class="language-julia">Q, R &#61; qr&#40;A&#41;; Q &#61; Matrix&#40;Q&#41;
+xʳ &#61; R \ &#40;Q&#39;b&#41;
+eʳ &#61; norm&#40;xᵉ - xʳ&#41; / norm&#40;xᵉ&#41;
+@show xʳ
+@show eʳ</code></pre>
+<pre><code class="plaintext code-output">xʳ = [0.9999999962497133, 1.9999999962497135, 1.000000003750286]
+eʳ = 2.65185298142961e-9
+</code></pre>
+<p>Clearly, this solution is much more accurate than that obtained via the normal equations. The cost is essentially the same, so there&#39;s no real downside to using QR. In general, we can use QR implicitly via the backslash operator, which organizes its computations in a slightly different way, and obtains even better accuracy:</p>
+<pre><code class="language-julia">xᵇ &#61; A \ b
+eᵇ &#61; norm&#40;xᵉ - xᵇ&#41; / norm&#40;xᵉ&#41;
+@show xᵇ
+@show eᵇ</code></pre>
+<pre><code class="plaintext code-output">xᵇ = [0.9999999998372181, 1.9999999998372184, 1.0000000001627825]
+eᵇ = 1.1510423702442077e-10
+</code></pre>
 
 <div class="page-foot">
   <div class="copyright">
-    &copy; Michael P. Friedlander | Last modified: January 12, 2022.
+    &copy; Michael P. Friedlander | Last modified: January 16, 2022.
   </br> Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
