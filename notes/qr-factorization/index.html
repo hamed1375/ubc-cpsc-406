@@ -167,19 +167,19 @@ Q, R &#61; qr&#40;A&#41;</code></pre>
 <p><pre><code class="plaintext code-output">LinearAlgebra.QRCompactWY{Float64, Matrix{Float64}}
 Q factor:
 4×4 LinearAlgebra.QRCompactWYQ{Float64, Matrix{Float64}}:
- -0.806315   0.536161   0.046951  -0.245321
-  0.120906  -0.215319  -0.292246  -0.923911
- -0.551501  -0.693514  -0.408705   0.218733
- -0.176305  -0.430357   0.863335  -0.195862
+ -0.386912  -0.359358    0.518022   0.672915
+  0.750487   0.128135   -0.165034   0.626989
+  0.208454  -0.920171   -0.300167  -0.140471
+ -0.493574   0.0879102  -0.783784   0.366523
 R factor:
 3×3 Matrix{Float64}:
- 3.01006   1.47953  -0.0597661
- 0.0      -1.51573   0.797734
- 0.0       0.0       0.348374</code></pre> and we can verify the orthogonality of <code>Q</code>:</p>
+ -1.28236  -1.171     0.0681071
+  0.0       2.31192  -0.532419
+  0.0       0.0       1.92057</code></pre> and we can verify the orthogonality of <code>Q</code>:</p>
 <pre><code class="language-julia">@show norm&#40;Q&#39;*Q - I&#41;
 @show norm&#40;Q*Q&#39; - I&#41;</code></pre>
-<pre><code class="plaintext code-output">norm(Q' * Q - I) = 5.111285522802738e-16
-norm(Q * Q' - I) = 3.433175098891678e-16
+<pre><code class="plaintext code-output">norm(Q' * Q - I) = 1.2390152374652483e-15
+norm(Q * Q' - I) = 1.2735847828719256e-15
 </code></pre>
 <p>Julia <a href="https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/#LinearAlgebra.QRCompactWY">stores</a> the factor <code>Q</code> as a series of <a href="https://en.wikipedia.org/wiki/Householder_transformation#QR_decomposition">Householder reflectors</a>.</p>
 <h3 id="thin_qr"><a href="#thin_qr" class="header-anchor">Thin QR</a></h3>
@@ -192,7 +192,7 @@ R₁ &#61; F.R
 @show norm&#40;A - Q₁*R₁&#41;</code></pre>
 <pre><code class="plaintext code-output">size(Q₁) = (4, 3)
 size(R₁) = (3, 3)
-norm(A - Q₁ * R₁) = 5.125396027766235e-16
+norm(A - Q₁ * R₁) = 1.1564453092915794e-15
 </code></pre>
 <h2 id="solving_least_squares_via_qr"><a href="#solving_least_squares_via_qr" class="header-anchor">Solving least squares via QR</a></h2>
 <p>The QR factorization can be used to solve the least squares problem</p>
@@ -228,7 +228,7 @@ x &#61; R₁ \ Q₁&#39;b # do NOT use x &#61; inv&#40;R₁&#41;*Q₁&#39;b</cod
 <p>and we can verify that <code>x</code> is the least-squares solution by verifying that the residual \(r=b-Ax\) is orthogonal to the columns of \(A\): </p>
 <pre><code class="language-julia">r &#61; b - A*x
 @show norm&#40;A&#39;r&#41;</code></pre>
-<pre><code class="plaintext code-output">norm(A' * r) = 7.309343360625301e-16
+<pre><code class="plaintext code-output">norm(A' * r) = 7.447602459741819e-16
 </code></pre>
 <p>The last line of the derivation shown in <span class="eqref">(<a href="#eqls-derivation">3</a>)</span> asserts that the norm of the residual is equal to the norm of \(Q_2^T b\). Let&#39;s check:</p>
 <pre><code class="language-julia">Q₂ &#61; F.Q&#91;:,n&#43;1:end&#93;
@@ -276,8 +276,8 @@ xʳ &#61; R \ &#40;Q&#39;b&#41;
 eʳ &#61; norm&#40;xᵉ - xʳ&#41; / norm&#40;xᵉ&#41;
 @show xʳ
 @show eʳ</code></pre>
-<pre><code class="plaintext code-output">xʳ = [0.9999999962497133, 1.9999999962497135, 1.000000003750286]
-eʳ = 2.65185298142961e-9
+<pre><code class="plaintext code-output">xʳ = [1.0000000018142614, 2.000000001814262, 0.9999999981857385]
+eʳ = 1.2828767274589433e-9
 </code></pre>
 <p>Clearly, this solution is much more accurate than that obtained via the normal equations. The cost is essentially the same, so there&#39;s no real downside to using QR. In general, we can use QR implicitly via the backslash operator, which organizes its computations in a slightly different way, and obtains even better accuracy:</p>
 <pre><code class="language-julia">xᵇ &#61; A \ b
