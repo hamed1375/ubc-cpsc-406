@@ -246,18 +246,9 @@ plot&#33;&#40;leg&#61;false, xlab&#61;&quot;Month index from 1999 to 2021&quot;,
 <p>But perhaps most interestingly, we can now &quot;detrend&quot; the data to understand how the concentrations vary around the overall 22-year trend:</p>
 <pre><code class="language-julia">@df dfg scatter&#40;:avgppb - p.&#40;t&#41;&#41;</code></pre>
 <img src="/ubc-cpsc-406/assets/notes/least-squares/code/output/ls-n2o-3.png" alt="">
-<h2 id="exercises"><a href="#exercises" class="header-anchor">Exercises</a></h2>
-<ol>
-<li><p>Compute the least-squares solution \(x^*\) corresponding to the matrix and vector</p>
-</li>
-</ol>
-<div class="nonumber">\[
-A = \begin{bmatrix} 1 \\ \vdots \\ 1 \end{bmatrix} = e \in \mathbb R^m \quad \text{ and } \quad 
-b = \begin{bmatrix} b_1 \\ \vdots \\ b_m \end{bmatrix}.
-\]</div>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Michael P. Friedlander | Last modified: January 17, 2022.
+    &copy; Michael P. Friedlander | Last modified: January 18, 2022.
   </br> Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
