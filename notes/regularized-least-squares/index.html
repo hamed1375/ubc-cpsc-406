@@ -151,26 +151,25 @@ Dx = \begin{bmatrix} x_1 - x_2 \\ x_2 - x_3 \\ \vdots \\ x_{n-1} - x_n\end{bmatr
 \[
 (I + \lambda D^T\! D)x = b.
 \]
-<pre><code class="language-julia">finiteDiff&#40;n&#41; &#61; diagm&#40;ones&#40;n&#41;&#41; - diagm&#40;&#43;1 &#61;&gt; ones&#40;n-1&#41;&#41;
+<pre><code class="language-julia">finiteDiff&#40;n&#41; &#61; &#40;diagm&#40;ones&#40;n&#41;&#41; - diagm&#40;&#43;1 &#61;&gt; ones&#40;n-1&#41;&#41;&#41;&#91;1:n-1&#93;
 finiteDiff&#40;4&#41;</code></pre>
-<pre><code class="plaintext code-output">4×4 Matrix{Float64}:
- 1.0  -1.0   0.0   0.0
- 0.0   1.0  -1.0   0.0
- 0.0   0.0   1.0  -1.0
- 0.0   0.0   0.0   1.0</code></pre>
+<pre><code class="plaintext code-output">3-element Vector{Float64}:
+ 1.0
+ 0.0
+ 0.0</code></pre>
 <pre><code class="language-julia">D &#61; finiteDiff&#40;n&#41;</code></pre>
 <pre><code class="language-julia">λ &#61; 100
 plot&#40;t, b, leg &#61;:topleft, label&#61;&quot;noisy data&quot;&#41;
-b̂ &#61; &#91; b; zeros&#40;n&#41;&#93;
+b̂ &#61; &#91; b; zeros&#40;n-1&#41;&#93;
 for λ in LinRange&#40;100,5000,5&#41; 
     Â &#61; &#91; I; √λ*D &#93;
     xLS &#61; Â \ b̂
     plot&#33;&#40;t, xLS, label&#61;&quot;λ &#61; &#36;&#40;λ&#41;&quot;&#41;
 end</code></pre>
-<img src="/ubc-cpsc-406/assets/notes/regularized-least-squares/code/output/ls-reg-noisy3.png" alt="">
+<p><span style="color:red;">// Image matching '/assets/notes/regularized-least-squares/code/ls-reg-noisy3' not found. //</span></p>
 <div class="page-foot">
   <div class="copyright">
-    &copy; Michael P. Friedlander | Last modified: January 20, 2022.
+    &copy; Michael P. Friedlander | Last modified: January 21, 2022.
   </br> Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
   </div>
 </div>
